@@ -128,6 +128,12 @@ export class SettingsTreeSettingElement extends SettingsTreeElement {
 	 * The default value
 	 */
 	defaultValue?: any;
+	/**
+	 * The source of the default value to display.
+	 * This value also accounts for extension-contributed language-specific default value overrides,
+	 * whereas setting.defaultValueSource only accounts for non-language-specific default value overrides.
+	 */
+	defaultValueSource: string | IExtensionInfo | undefined;
 
 	/**
 	 * Whether the setting is configured in the selected scope.
@@ -238,7 +244,10 @@ export class SettingsTreeSettingElement extends SettingsTreeElement {
 			}
 		}
 
-		this.setting.defaultValueSource = undefined;
+		// The user might have added, removed, or modified a language filter, so we reset the default value source
+		// to the non-language-specific default value source for now.
+		this.defaultValueSource = this.setting.defaultValueSource;
+
 		if (inspected.policyValue) {
 			this.hasPolicyValue = true;
 			isConfigured = false; // The user did not manually configure the setting themselves.
@@ -256,7 +265,7 @@ export class SettingsTreeSettingElement extends SettingsTreeElement {
 			const registryValues = Registry.as<IConfigurationRegistry>(Extensions.Configuration).getConfigurationDefaultsOverrides();
 			const overrideValueSource = registryValues.get(`[${languageSelector}]`)?.valuesSources?.get(this.setting.key);
 			if (overrideValueSource) {
-				this.setting.defaultValueSource = overrideValueSource;
+				this.defaultValueSource = overrideValueSource;
 			}
 		} else {
 			this.scopeValue = isConfigured && inspected[targetSelector];

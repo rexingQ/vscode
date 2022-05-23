@@ -930,7 +930,7 @@ export abstract class AbstractSettingRenderer extends Disposable implements ITre
 
 		template.indicatorsLabel.updateSyncIgnored(element, this.ignoredSettings);
 		template.indicatorsLabel.updateDefaultOverrideIndicator(element);
-		template.indicatorsLabel.updateLanguageOverrides(element, template.toDispose, this._onApplyLanguageFilter);
+		template.indicatorsLabel.updateLanguageOverrides(element, template.toDispose, this._onApplyFilter);
 		template.elementDisposables.add(this.onDidChangeIgnoredSettings(() => {
 			template.indicatorsLabel.updateSyncIgnored(element, this.ignoredSettings);
 		}));

@@ -354,7 +354,8 @@
 	vertical-align: text-top;
 }
 
-.settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides a.modified-scope {
+.settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides a.modified-scope,
+.settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-language-overrides a.language-link {
 	text-decoration: underline;
 	cursor: pointer;
 }

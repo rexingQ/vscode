@@ -10,6 +10,7 @@ import { Emitter } from 'vs/base/common/event';
 import { DisposableStore } from 'vs/base/common/lifecycle';
 import { localize } from 'vs/nls';
 import { SettingsTreeSettingElement } from 'vs/workbench/contrib/preferences/browser/settingsTreeModels';
+import { LANGUAGE_SETTING_TAG } from 'vs/workbench/contrib/preferences/common/preferences';
 
 const $ = DOM.$;
 
@@ -96,7 +97,7 @@ export class SettingsTreeIndicatorsLabel {
 		this.render();
 	}
 
-	updateLanguageOverrides(element: SettingsTreeSettingElement, elementDisposables: DisposableStore, onApplyLanguageFilter: Emitter<string>) {
+	updateLanguageOverrides(element: SettingsTreeSettingElement, elementDisposables: DisposableStore, onApplyFilter: Emitter<string>) {
 		this.languageOverridesElement.style.display = 'none';
 		if (element.languageDefaultOverrides.size) {
 			this.languageOverridesElement.style.display = 'inline';
@@ -117,7 +118,7 @@ export class SettingsTreeIndicatorsLabel {
 
 				elementDisposables.add(
 					DOM.addStandardDisposableListener(languageLink, DOM.EventType.CLICK, e => {
-						onApplyLanguageFilter.fire(language);
+						onApplyFilter.fire(`@${LANGUAGE_SETTING_TAG}${language}`);
 						e.preventDefault();
 						e.stopPropagation();
 					}));
@@ -160,9 +161,9 @@ export class SettingsTreeIndicatorsLabel {
 
 	updateDefaultOverrideIndicator(element: SettingsTreeSettingElement) {
 		this.defaultOverrideIndicatorElement.style.display = 'none';
-		if (element.setting.defaultValueSource) {
+		if (element.defaultValueSource) {
 			this.defaultOverrideIndicatorElement.style.display = 'inline';
-			const defaultValueSource = element.setting.defaultValueSource;
+			const defaultValueSource = element.defaultValueSource;
 			if (typeof defaultValueSource !== 'string' && defaultValueSource.id !== element.setting.extensionInfo?.id) {
 				const extensionSource = defaultValueSource.displayName ?? defaultValueSource.id;
 				this.defaultOverrideIndicatorLabel.title = localize('defaultOverriddenDetails', "Default setting value overridden by {0}", extensionSource);

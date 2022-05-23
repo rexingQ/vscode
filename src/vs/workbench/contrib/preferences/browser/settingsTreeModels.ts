@@ -221,6 +221,7 @@ export class SettingsTreeSettingElement extends SettingsTreeElement {
 			overriddenScopeList.push(localize('user', "User"));
 		}
 
+		this.languageDefaultOverrides.clear();
 		if (inspected.overrideIdentifiers) {
 			for (const overrideIdentifier of inspected.overrideIdentifiers) {
 				const inspectedOverride = inspectedLanguageOverrides.get(overrideIdentifier);
@@ -237,6 +238,7 @@ export class SettingsTreeSettingElement extends SettingsTreeElement {
 			}
 		}
 
+		this.setting.defaultValueSource = undefined;
 		if (inspected.policyValue) {
 			this.hasPolicyValue = true;
 			isConfigured = false; // The user did not manually configure the setting themselves.

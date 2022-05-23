@@ -96,16 +96,32 @@ export class SettingsTreeIndicatorsLabel {
 		this.render();
 	}
 
-	updateLanguageOverrides(element: SettingsTreeSettingElement) {
+	updateLanguageOverrides(element: SettingsTreeSettingElement, elementDisposables: DisposableStore, onApplyLanguageFilter: Emitter<string>) {
 		this.languageOverridesElement.style.display = 'none';
-		const overrideSources: string[] = [];
-		for (const language of element.languageDefaultOverrides.keys()) {
-			overrideSources.push(language);
-		}
-		if (overrideSources.length) {
+		if (element.languageDefaultOverrides.size) {
 			this.languageOverridesElement.style.display = 'inline';
-			this.languageOverridesLabel.title = localize('languageOverridesDetails', "Language-specific settings or default value overrides occur for {0}", overrideSources.join(', '));
-			this.languageOverridesLabel.text = localize('languageOverridesLabelText', "$(globe) {0}", overrideSources.join(', '));
+			this.languageOverridesLabel.text = localize('languageOverridesLabelText', "$(globe) ");
+			const overrideSources: string[] = [];
+			for (const language of element.languageDefaultOverrides.keys()) {
+				overrideSources.push(language);
+			}
+			this.languageOverridesLabel.title = localize('languageOverridesDetails', "Language-specific settings or default value overrides occur for: {0}", overrideSources.join(', '));
+
+			for (let i = 0; i < overrideSources.length; i++) {
+				const language = overrideSources[i];
+				const languageLink = DOM.append(this.languageOverridesElement, $('a.language-link', undefined, language));
+
+				if (i !== overrideSources.length - 1) {
+					DOM.append(this.languageOverridesElement, $('span', undefined, ', '));
+				}
+
+				elementDisposables.add(
+					DOM.addStandardDisposableListener(languageLink, DOM.EventType.CLICK, e => {
+						onApplyLanguageFilter.fire(language);
+						e.preventDefault();
+						e.stopPropagation();
+					}));
+			}
 		}
 		this.render();
 	}

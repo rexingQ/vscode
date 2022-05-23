@@ -18,7 +18,7 @@ import { FOLDER_SCOPES, WORKSPACE_SCOPES, REMOTE_MACHINE_SCOPES, LOCAL_MACHINE_S
 import { IJSONSchema } from 'vs/base/common/jsonSchema';
 import { Disposable } from 'vs/base/common/lifecycle';
 import { Emitter } from 'vs/base/common/event';
-import { ConfigurationScope, EditPresentationTypes, Extensions, IConfigurationRegistry } from 'vs/platform/configuration/common/configurationRegistry';
+import { ConfigurationScope, EditPresentationTypes, Extensions, IConfigurationRegistry, IExtensionInfo } from 'vs/platform/configuration/common/configurationRegistry';
 import { ILanguageService } from 'vs/editor/common/languages/language';
 import { Registry } from 'vs/platform/registry/common/platform';
 
@@ -146,7 +146,18 @@ export class SettingsTreeSettingElement extends SettingsTreeElement {
 
 	tags?: Set<string>;
 	overriddenScopeList: string[] = [];
+
+	/**
+	 * Language-specific default overrides for this setting.
+	 * The key is the language.
+	 */
+	languageDefaultOverrides: Map<string, string | IExtensionInfo | undefined> = new Map<string, string | IExtensionInfo | undefined>();
+
+	/**
+	 * For each language that contributes setting values or default overrides, we can see those values here.
+	 */
 	languageOverrideValues: Map<string, IConfigurationValue<unknown>> = new Map<string, IConfigurationValue<unknown>>();
+
 	description!: string;
 	valueType!: SettingValueType;
 
@@ -215,6 +226,13 @@ export class SettingsTreeSettingElement extends SettingsTreeElement {
 				const inspectedOverride = inspectedLanguageOverrides.get(overrideIdentifier);
 				if (inspectedOverride) {
 					this.languageOverrideValues.set(overrideIdentifier, inspectedOverride);
+
+					if (typeof inspectedOverride.default?.override !== 'undefined') {
+						// We want to figure out where the default value got overridden.
+						const registryValues = Registry.as<IConfigurationRegistry>(Extensions.Configuration).getConfigurationDefaultsOverrides();
+						const overrideValueSource = registryValues.get(`[${overrideIdentifier}]`)?.valuesSources?.get(this.setting.key);
+						this.languageDefaultOverrides.set(overrideIdentifier, overrideValueSource);
+					}
 				}
 			}
 		}
